@@ -1,4 +1,3 @@
-// src/index.ts
 import "dotenv/config";
 import express from "express";
 import { randomUUID } from "node:crypto";
@@ -14,6 +13,7 @@ import { z } from "zod";
 import cors from "cors";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
+const PORT = process.env.PORT || 3001;
 const mcpServerUrl = new URL(
   process.env.MCP_SERVER_URL || "http://localhost:3001",
 );
@@ -42,8 +42,6 @@ const tokenVerifier = {
         issuer: `${supabaseUrl}/auth/v1`,
         audience: "authenticated",
       });
-
-      console.log("Token payload:", payload);
 
       if (!payload.sub) throw new Error("Missing sub claim");
 
@@ -161,36 +159,6 @@ function createMcpServer() {
   return server;
 }
 
-// MCP route handlers
-// app.post("/", async (req, res) => {
-//   const sessionId = req.headers["mcp-session-id"] as string | undefined;
-//   let transport: StreamableHTTPServerTransport;
-
-//   if (sessionId && transports[sessionId]) {
-//     transport = transports[sessionId];
-//   } else if (!sessionId && isInitializeRequest(req.body)) {
-//     transport = new StreamableHTTPServerTransport({
-//       sessionIdGenerator: () => randomUUID(),
-//       onsessioninitialized: (id) => {
-//         transports[id] = transport;
-//       },
-//     });
-//     transport.onclose = () => {
-//       if (transport.sessionId) delete transports[transport.sessionId];
-//     };
-//     await createMcpServer().connect(transport);
-//   } else {
-//     res.status(400).json({
-//       jsonrpc: "2.0",
-//       error: { code: -32000, message: "Bad Request" },
-//       id: null,
-//     });
-//     return;
-//   }
-
-//   await transport.handleRequest(req, res, req.body);
-// });
-
 app.post("/", async (req, res) => {
   console.log("BODY:", req.body);
   console.log("AUTH HEADER:", req.headers.authorization);
@@ -231,9 +199,6 @@ app.post("/", async (req, res) => {
 
   console.log("Session ID:", sessionId);
 
-  // if (sessionId && transports[sessionId]) {
-  //   transport = transports[sessionId];
-  // } else if (!sessionId && isInitializeRequest(req.body)) {
   if (sessionId && transports[sessionId]) {
     transport = transports[sessionId];
   } else if (isInitializeRequest(req.body)) {
@@ -281,6 +246,6 @@ app.delete("/", authMiddleware, async (req, res) => {
   await transport.handleRequest(req, res);
 });
 
-app.listen(3001, () => {
+app.listen(PORT, () => {
   console.log(`GetHired MCP Server running at ${mcpServerUrl.origin}`);
 });
