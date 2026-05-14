@@ -28,6 +28,7 @@ const oauthMetadata = {
   response_types_supported: ["code"],
   grant_types_supported: ["authorization_code", "refresh_token"],
   code_challenge_methods_supported: ["S256"],
+  scopes_supported: ["openid", "email", "profile"],
 };
 
 // Verify tokens using Supabase JWKS (no introspection endpoint needed)
@@ -77,7 +78,7 @@ app.use(
   mcpAuthMetadataRouter({
     oauthMetadata,
     resourceServerUrl: mcpServerUrl,
-    scopesSupported: [],
+    scopesSupported: ["openid", "email", "profile"],
     resourceName: "GetHired MCP Server",
   }),
 );
