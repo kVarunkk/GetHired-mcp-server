@@ -77,14 +77,14 @@ app.use(
   mcpAuthMetadataRouter({
     oauthMetadata,
     resourceServerUrl: mcpServerUrl,
-    scopesSupported: ["mcp:tools"],
+    scopesSupported: [],
     resourceName: "GetHired MCP Server",
   }),
 );
 
 const authMiddleware = requireBearerAuth({
   verifier: tokenVerifier,
-  requiredScopes: ["mcp:tools"],
+  requiredScopes: [],
   resourceMetadataUrl: getOAuthProtectedResourceMetadataUrl(mcpServerUrl),
 });
 
@@ -225,7 +225,7 @@ app.post("/", async (req, res) => {
     return;
   }
 
-  await transport.handleRequest(req, res, req.body);
+  await transport.handleRequest(req, res);
 });
 
 app.get("/", authMiddleware, async (req, res) => {
