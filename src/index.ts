@@ -225,7 +225,7 @@ app.post("/", async (req, res) => {
     return;
   }
 
-  await transport.handleRequest(req, res);
+  await transport.handleRequest(req, res, req.body);
 });
 
 app.get("/", authMiddleware, async (req, res) => {
