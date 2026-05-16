@@ -1,6 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 
-export async function registerGetMyProfile(server: McpServer) {
+export async function registerGetMyProfile(
+  server: McpServer,
+  transport: "stdio" | "http",
+) {
   server.registerTool(
     "get_my_profile",
     {
@@ -12,8 +15,10 @@ export async function registerGetMyProfile(server: McpServer) {
       inputSchema: {},
     },
     async (_, { authInfo }) => {
+      const token =
+        transport === "http" ? authInfo?.token : process.env.GETHIRED_API_TOKEN;
       const res = await fetch(`${process.env.GETHIRED_URL}/api/user/profile`, {
-        headers: { Authorization: `Bearer ${authInfo?.token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) {

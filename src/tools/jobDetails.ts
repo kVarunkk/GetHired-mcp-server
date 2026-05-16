@@ -1,7 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import z from "zod";
 
-export function registerGetJobDetails(server: McpServer) {
+export function registerGetJobDetails(
+  server: McpServer,
+  transport: "stdio" | "http",
+) {
   server.registerTool(
     "get_job_details",
     {
@@ -13,9 +16,11 @@ export function registerGetJobDetails(server: McpServer) {
       },
     },
     async ({ job_id }, { authInfo }) => {
+      const token =
+        transport === "http" ? authInfo?.token : process.env.GETHIRED_API_TOKEN;
       const res = await fetch(
         `${process.env.GETHIRED_URL}/api/jobs/${job_id}`,
-        { headers: { Authorization: `Bearer ${authInfo?.token}` } },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (!res.ok) {
@@ -33,7 +38,6 @@ export function registerGetJobDetails(server: McpServer) {
       }
 
       const data = await res.json();
-      console.log(data);
 
       return {
         content: [

@@ -1,7 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
 
-export function registerSearchJobs(server: McpServer) {
+export function registerSearchJobs(
+  server: McpServer,
+  transport: "stdio" | "http",
+) {
   server.registerTool(
     "search_jobs",
     {
@@ -117,7 +120,8 @@ export function registerSearchJobs(server: McpServer) {
       { authInfo },
     ) => {
       const params = new URLSearchParams();
-
+      const token =
+        transport === "http" ? authInfo?.token : process.env.GETHIRED_API_TOKEN;
       // Multi-value params joined with | separator
       if (jobTitleKeywords?.length)
         params.set("jobTitleKeywords", jobTitleKeywords.join("|"));
@@ -143,7 +147,7 @@ export function registerSearchJobs(server: McpServer) {
         `${process.env.GETHIRED_URL}/api/jobs?${params.toString()}`,
         {
           headers: {
-            Authorization: `Bearer ${authInfo?.token}`,
+            Authorization: `Bearer ${token}`,
           },
         },
       );

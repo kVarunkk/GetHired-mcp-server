@@ -57,7 +57,7 @@ export async function startHttpServer() {
         if (transport.sessionId) delete transports[transport.sessionId];
       };
 
-      await createMcpServer().connect(transport);
+      await createMcpServer("http").connect(transport);
     }
 
     await transport.handleRequest(req, res, req.body);
